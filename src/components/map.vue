@@ -1,12 +1,12 @@
 <template>
-  <div  class="text-center">
+  <div  class="text-center col-10">
     <b-btn variant="success"  ref="btn_click"   @click="getLocation">Get Location  </b-btn>
     <b-dropdown text="Right align" variant="warning" right class="m-md-2">
         <b-dropdown-item href="#" v-for="location in locationList" v-bind:item="item"   v-bind:index="location"  v-bind:key="location.name" >{{location.name}}</b-dropdown-item>
     </b-dropdown>
 
     <b-form-select v-model="selected"   value-field="name" text-field="name"  :options="locationList"  class="mb-3" ></b-form-select>
-    <gmap-map   :center="center"  :zoom="zoom"  map-type-id="terrain"  style="width: 1000px; height: 300px">
+    <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="terrain"  >
           <gmap-marker :key="index" v-for="(m, index) in markers" :position="m.position" :clickable="true" @click="center=m.position" ></gmap-marker>
     </gmap-map>
 
