@@ -5,8 +5,10 @@
         <b-dropdown-item href="#" v-for="location in locationList" v-bind:item="item"   v-bind:index="location"  v-bind:key="location.name" >{{location.name}}</b-dropdown-item>
     </b-dropdown>
 
-    <b-form-select v-model="selected"  value-field="name" text-field="name"  :options="locationList"  class="mb-3" ></b-form-select>
-    <gmap-map   :center="center"  :zoom="zoom"  map-type-id="terrain"  style="width: 1000px; height: 300px"></gmap-map>
+    <b-form-select v-model="selected"   value-field="name" text-field="name"  :options="locationList"  class="mb-3" ></b-form-select>
+    <gmap-map   :center="center"  :zoom="zoom"  map-type-id="terrain"  style="width: 1000px; height: 300px">
+          <gmap-marker :key="index" v-for="(m, index) in markers" :position="m.position" :clickable="true" @click="center=m.position" ></gmap-marker>
+    </gmap-map>
 
     {{selected}}
 </div>
@@ -27,16 +29,25 @@
       return {
         center: { lat: 25.079613, lng: 121.556082 },
         zoom: 13,
-        markers: [{
-          position: {
-            lat: 25.0781209,
-            lng: 121.5730155
-          },
-          infoText: 'Marker 1'
-        }],
+        markers: [],
         locationList: [],
         errorMsg: '',
-        selected: {}
+        selected: '',
+        matchLocation: []
+      }
+    },
+    watch: {
+      selected: function (val) {
+        this.matchLocation = this.locationList.filter(function (location) {
+          return location.name === val
+        }
+        )
+        this.markers = this.matchLocation.map(({ lng, lat, name }) => {
+          return {
+            position: { lng, lat },
+            infoText: name
+          }
+        })
       }
     },
     methods: {
@@ -45,6 +56,13 @@
         Vue.axios.get(api).then(response => {
           this.locationList = response.data
         })
+      },
+      updateMap () {
+        this.markers = this.locationList.filter(function (location) {
+          return location.name === this.selected
+        }
+        )
+        alert(this.markers)
       }
     }
   }
