@@ -1,11 +1,17 @@
 language: node_js
 node_js:
   - "6"
-before_install:
+install:
   - npm install
 cache:
   directories:
     - "node_modules"
 script:
   - npm run build
+
+deploy:
+  provider: Heroku
+  api_key: 
+    secure: eZg3Jz0/ArS/cTA15YpUE2fVbEAWJoGYS4HQbUIImYJo2jDcJ8KHywzetsoxRHp8Ym8cfzn5rqCyNDCtqBKuZFd0S8f1/HKOPHn1CZlikbr5b+0qspXi0ExOwKJ7bAfv4WNP7/kYImxJt7fwH56WVWSo+fEnSqm4j0Na/yvHX93MQX3V4dMHvTzDb2+3JyP2e0DNpZ9MKvyIxhgcP5PD2LIMhMD03ZS0L1SToDNxBJd6xfXHrl+xEp054o5hlSQPpmwUyrKLUj9XbzPmA+o80VnVpNqIl6dDbq2nemqRkEk7q8s6DuJh8X142jsQ7goe4G9T1M3cx72l4UU5Im7BoJ0mXcemMZZ29IuWuruETYC/p4TxdGzKVzYmu8KSqjgkXiQSv17pNEAWsukNslpJ1q9JP22Y9lvixSzM4roBE0gbVpsAlchFDppYbxs+dKeoj/bpswy/dpt1d8uUq9b1/0Y5/VLHrC39GjF5z2Jzg53hU1UUcEuF/5s58ZlKORzoTsWJzFkEI/voHYAlLi0kM0HObpPGF2MLvTNdIWfB2d++XgK67ZNMXPDBdtyE/89+fuQJXyHP7vZphH/D6ITdCwOXGttBC39xDAqp0odb6NSi8FxJTfPwod2+CMftxHKa+yn8IqWQ1x9gJ66O+xpoZ15GJWg5dWGrbZuxBwQWZng=
+  app: qatbadmapdemo
      
