@@ -6,7 +6,7 @@
     </b-dropdown>
 
     <b-form-select v-model="selected"  value-field="name" text-field="name"  :options="locationList"  class="mb-3" ></b-form-select>
-    <gmap-map   :center="center"  :zoom="zoom"  map-type-id="terrain"  style="width: 500px; height: 300px"></gmap-map>
+    <gmap-map   :center="center"  :zoom="zoom"  map-type-id="terrain"  style="width: 1000px; height: 300px"></gmap-map>
 
     {{selected}}
 </div>
@@ -25,7 +25,7 @@
   export default {
     data () {
       return {
-        center: { lat: 23.6052631, lng: 120.1412734 },
+        center: { lat: 25.079613, lng: 121.556082 },
         zoom: 13,
         markers: [{
           position: {
