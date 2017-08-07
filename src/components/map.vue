@@ -1,23 +1,43 @@
 <template>
-  <div align="center" class="text-center col-10">
-    <b-btn variant="success"  ref="btn_click"   @click="getLocation">Get Location  </b-btn>
-    <b-dropdown text="Right align" variant="warning" right class="m-md-2">
-        <b-dropdown-item href="#" v-for="location in locationList" v-bind:item="item"   v-bind:index="location"  v-bind:key="location.name" >{{location.name}}</b-dropdown-item>
-    </b-dropdown>
-
-    <b-form-select v-model="selected"   value-field="name" text-field="name"  :options="locationList"  class="mb-3" ></b-form-select>
-    <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
-          <gmap-marker :key="index" v-for="(m, index) in markers" :position="m.position" :clickable="true" @click="center=m.position" ></gmap-marker>
-    </gmap-map>
-
-    {{selected}}
+  <div align="center" class="text-center col-12">
+    <div align="center" v-if="loading" class="col-12 overlay">
+      <hour-glass size="500px"></hour-glass>
+    </div>
+    <div class="col-12" v-if="!loading">
+      <div class="col-4">
+        <span class="label label-default" for="selectLocation">Specify Location</span>
+        <div >
+          <b-form-select v-model="selected"  id="selectLocation" value-field="name" text-field="name"  :options="locationList"  class="mb-3" ></b-form-select>
+        </div>
+      </div>
+      <div class="col-4">
+  
+      </div>      
+      <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
+            <gmap-marker :key="index" v-for="(m, index) in markers" :position="m.position" :clickable="true" @click="center=m.position" ></gmap-marker>
+      </gmap-map>
+    </div>
+  </div>
 </div>
-
 </template>
+
+<style>
+.overlay {
+    background: #e9e9e9;  
+    position: absolute;   
+    top: 0;               
+    right: 0;             
+    bottom: 0;
+    left: 0;
+    opacity: 0.5;
+    z-index: 3000;
+}
+</style>
 <script>
   import Vue from 'vue'
   import * as VueGoogleMaps from 'vue2-google-maps'
   import axios from 'axios'
+  import HourGlass from 'vue-loading-spinner/src/components/HourGlass.vue'
   Vue.use(VueGoogleMaps, {
     load: {
       key: 'AIzaSyBW6jkW1QIMpjw5SUIytKmuQ40emkWLgM8',
@@ -34,18 +54,21 @@
         locationList: [],
         errorMsg: '',
         selected: '',
-        matchLocation: []
+        matchLocation: [],
+        loading: true
       }
     },
     created () {
       axios.get(`https://qatbadmap.herokuapp.com/api/locationinfolist`).then(response => {
         this.locationList = response.data
+        this.loading = false
+        this.updateMap()
       })
     },
     watch: {
       selected: function (val) {
         this.matchLocation = this.locationList.filter(function (location) {
-          return location.name === val
+          return val === '' || location.name === val
         }
         )
         this.markers = this.matchLocation.map(({ lng, lat, name }) => {
@@ -58,19 +81,19 @@
       }
     },
     methods: {
-      getLocation () {
-        const api = 'https://qatbadmap.herokuapp.com/api/locationinfolist'
-        Vue.axios.get(api).then(response => {
-          this.locationList = response.data
-        })
-      },
       updateMap () {
-        this.markers = this.locationList.filter(function (location) {
-          return location.name === this.selected
-        }
-        )
-        alert(this.markers)
+        this.matchLocation = this.locationList
+        this.markers = this.matchLocation.map(({ lng, lat, name }) => {
+          return {
+            position: { lng, lat },
+            infoText: name
+          }
+        })
+        this.center = this.markers[0].position
       }
+    },
+    components: {
+      HourGlass
     }
   }
 </script>
