@@ -14,8 +14,12 @@
   
       </div>      
       <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
-            <gmap-marker :key="index" v-for="(m, index) in markers" :position="m.position" :clickable="true" @click="center=m.position" ></gmap-marker>
+            <gmap-marker :key="index" v-for="(m, index) in markers" :position="m.position" :clickable="true" @click="showModal(m)" :label="m.infoText"  ></gmap-marker>
       </gmap-map>
+
+      <b-modal ref="modal" title="Location Info" @ok="closeModal" >
+        {{selectedLocation}}
+      </b-modal>
     </div>
   </div>
 </div>
@@ -44,6 +48,13 @@
       v: '3'
     }
   })
+  function getBadminInfoList () {
+    return axios.get('https://qatbadmap.herokuapp.com/api/badmintoninfolist')
+  }
+
+  function getLocationInfoList () {
+    return axios.get('https://qatbadmap.herokuapp.com/api/locationinfolist')
+  }
 
   export default {
     data () {
@@ -52,44 +63,50 @@
         zoom: 14,
         markers: [],
         locationList: [],
+        badmintonList: [],
         errorMsg: '',
         selected: '',
         matchLocation: [],
-        loading: true
+        loading: true,
+        selectedLocation: {}
       }
     },
     created () {
-      axios.get(`https://qatbadmap.herokuapp.com/api/locationinfolist`).then(response => {
-        this.locationList = response.data
-        this.loading = false
-        this.updateMap()
-      })
+      var self = this
+      axios.all([getBadminInfoList(), getLocationInfoList()]).then(axios.spread(function (badmintonResponse, locationResponse) {
+        self.badmintonList = badmintonResponse.data
+        self.locationList = locationResponse.data
+        self.loading = false
+        self.updateMap()
+      }))
     },
     watch: {
       selected: function (val) {
-        this.matchLocation = this.locationList.filter(function (location) {
-          return val === '' || location.name === val
+        this.markers = this.badmintonList.filter(function (badmintonInfo) {
+          return val === '' || badmintonInfo.location === val
         }
         )
-        this.markers = this.matchLocation.map(({ lng, lat, name }) => {
-          return {
-            position: { lng, lat },
-            infoText: name
-          }
-        })
         this.center = this.markers[0].position
       }
     },
     methods: {
       updateMap () {
-        this.matchLocation = this.locationList
-        this.markers = this.matchLocation.map(({ lng, lat, name }) => {
-          return {
-            position: { lng, lat },
-            infoText: name
-          }
+        var self = this
+        this.badmintonList.forEach(function (badminton) {
+          var matchLocation = self.locationList.filter(function (location) { return location.name === badminton.location })
+
+          matchLocation ? badminton.position = {'lng': matchLocation[0].lng, 'lat': matchLocation[0].lat} : ''
+          matchLocation ? badminton.infoText = badminton.location + ' Start Time: ' + badminton.startTime : ''
         })
+        this.markers = this.badmintonList
         this.center = this.markers[0].position
+      },
+      closeModal (e) {
+        return e.cancel()
+      },
+      showModal (marker) {
+        this.selectedLocation = marker
+        this.$refs.modal.show()
       }
     },
     components: {
