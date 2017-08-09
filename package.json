@@ -20,6 +20,7 @@
     "vue-axios": "^2.0.2",
     "vue-loading-spinner": "^1.0.10",
     "vue-router": "^2.3.1",
+    "vue2-datepicker": "^1.2.1",
     "vue2-google-maps": "^0.7.10"
   },
   "devDependencies": {
