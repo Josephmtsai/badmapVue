@@ -14,7 +14,7 @@
         <button class="danger" @click="showTodayInfo()" >Show Today </button>
       </div>
       <div class="col-4">
-  
+        {{center}}
       </div>      
       <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
         <gmap-cluster >
@@ -65,7 +65,7 @@
     data () {
       return {
         center: { lat: 25.079613, lng: 121.556082 },
-        zoom: 14,
+        zoom: 15,
         markers: [],
         locationList: [],
         badmintonList: [],
@@ -81,6 +81,7 @@
     },
     created () {
       var self = this
+      self.getLocation()
       axios.all([getBadminInfoList(), getLocationInfoList()]).then(axios.spread(function (badmintonResponse, locationResponse) {
         self.badmintonList = badmintonResponse.data
         self.locationList = locationResponse.data
@@ -109,7 +110,7 @@
           matchLocation ? badminton.infoText = badminton.location + ' Start Time: ' + badminton.startTime : ''
         })
         this.markers = this.badmintonList
-        this.center = this.markers[0].position
+        // this.center = this.markers[0].position
       },
       closeModal (e) {
         return e.cancel()
@@ -122,8 +123,16 @@
         var self = this
         this.markers = this.badmintonList.filter(function (location) { return location.weekDayInt === self.todayWeekday })
         this.center = this.markers[0].position
+      },
+      getLocation () {
+        var self = this
+        if (navigator.geolocation) {
+          return navigator.geolocation.getCurrentPosition(function (position) { self.center = {lat: position.coords.latitude, lng: position.coords.longitude} })
+        } else {
+          console.log('Geolocation is not supported by this browser.')
+          return { lat: 25.079613, lng: 121.556082 }
+        }
       }
-
     },
     components: {
       HourGlass,
