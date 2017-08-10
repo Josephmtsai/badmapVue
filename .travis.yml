@@ -17,8 +17,8 @@ after_success:
   - cd ${PACKAGE_FOLDER}
   - rm -rf *
   - cp -r ../dist/* .
-  - cp -r server.js .
-  - cp -r Procile .
+  - cp -r ../server/* .
+  - cp -r Procfile .
   - find .
   - git add --all .
   - git commit --message "${TRAVIS_COMMIT_MESSAGE} [ci skip]"

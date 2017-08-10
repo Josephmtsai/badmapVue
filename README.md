@@ -19,3 +19,8 @@ npm run build --report
 ```
 
 For detailed explanation on how things work, checkout the [guide](http://vuejs-templates.github.io/webpack/) and [docs for vue-loader](http://vuejs.github.io/vue-loader).
+
+
+Please Setting the GH_TOKEN in travis setting, 
+
+https://blog.m157q.tw/posts/2016/05/08/use-travis-ci-to-publish-pelican-blog-on-github-pages-automatically/
