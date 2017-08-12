@@ -1,12 +1,31 @@
 <template>
-  <div align="center" class="text-center col-12">
+  <div  class="text-center col-12">
     <div align="center" v-if="loading" class="col-12 overlay">
       <hour-glass size="500px"></hour-glass>
     </div>
     <div class="col-12" v-if="!loading">
+      <b-card no-block>
+        <b-tabs small card ref="tabs" v-model="tabIndex">
+          <b-tab title="General Map">
+
+            <b-form-fieldset label="每周選項"  label-for="weeklist" >
+              <div role="group" id="checkboxes2">
+                <b-form-checkbox v-model="weekDays" v-for="(weekDayValue, index) in weekDaysOptions"  :value="index">{{weekDayValue}}</b-form-checkbox>
+              </div>
+            </b-form-fieldset>
+            <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
+              <gmap-cluster >
+                  <gmap-marker :key="index" v-for="(m, index) in markers" :position="m.position" :clickable="true" @click="showModal(m)" :label="m.infoText"  ></gmap-marker>
+              </gmap-cluster>
+            </gmap-map>
+          </b-tab>
+          <b-tab title="List Location Info">
+          </b-tab>
+        </b-tabs>
+      </b-card>
       <div class="col-4">
-        <date-picker v-model="endTime" range></date-picker>
-        {{endTime}}
+        
+
         <span class="label label-default" for="selectLocation">Specify Location</span>
         <div >
           <b-form-select v-model="selected"  id="selectLocation" value-field="name" text-field="name"  :options="locationList"  class="mb-3" ></b-form-select>
@@ -16,14 +35,11 @@
       <div class="col-4">
         {{center}}
       </div>      
-      <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
-        <gmap-cluster >
-            <gmap-marker :key="index" v-for="(m, index) in markers" :position="m.position" :clickable="true" @click="showModal(m)" :label="m.infoText"  ></gmap-marker>
-        </gmap-cluster>
-      </gmap-map>
+      
 
       <b-modal ref="modal" title="Location Info" @ok="closeModal" >
         {{selectedLocation}}
+        
       </b-modal>
     </div>
   </div>
@@ -74,22 +90,27 @@
         matchLocation: [],
         loading: true,
         selectedLocation: {},
-        startTime: '',
-        endTime: '',
-        todayWeekday: 0
+        dateTimeRange: [],
+        todayWeekday: 0,
+        weekDays: [],
+        weekDaysOptions: ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六']
       }
     },
     created () {
       var self = this
       self.getLocation()
+      var today = new Date()
+      self.todayWeekday = today.getDay()
+      // default 3 days
+      self.weekDays.push(self.todayWeekday)
+      self.weekDays.push(self.todayWeekday + 1 > 6 ? 0 : self.todayWeekday + 1)
+      self.weekDays.push(self.todayWeekday + 2 > 6 ? 1 : self.todayWeekday + 2)
       axios.all([getBadminInfoList(), getLocationInfoList()]).then(axios.spread(function (badmintonResponse, locationResponse) {
         self.badmintonList = badmintonResponse.data
         self.locationList = locationResponse.data
         self.loading = false
         self.updateMap()
       }))
-      var today = new Date()
-      self.todayWeekday = today.getDay()
     },
     watch: {
       selected: function (val) {
