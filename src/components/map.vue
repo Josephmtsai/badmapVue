@@ -15,7 +15,7 @@
             </b-form-fieldset>
             <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
               <gmap-cluster >
-                  <gmap-marker :key="index" v-for="(m, index) in markers" :position="m.position" :clickable="true" @click="showModal(m)" :label="m.infoText"  ></gmap-marker>
+                  <gmap-marker :key="index" v-for="m in markers" :position="m.position" :clickable="true" @click="showModal(m)" :label="m.name"  ></gmap-marker>
               </gmap-cluster>
             </gmap-map>
           </b-tab>
@@ -119,19 +119,25 @@
         }
         )
         this.center = this.markers[0].position
+      },
+      weekDays: function (val) {
+        this.updateMap()
       }
     },
     methods: {
       updateMap () {
         var self = this
-        this.badmintonList.forEach(function (badminton) {
-          var matchLocation = self.locationList.filter(function (location) { return location.name === badminton.location })
-
-          matchLocation ? badminton.position = {'lng': matchLocation[0].lng, 'lat': matchLocation[0].lat} : ''
-          matchLocation ? badminton.infoText = badminton.location + ' Start Time: ' + badminton.startTime : ''
+        this.badmintonList.filter(function (badminton) {
+          return self.weekDays.indexOf(badminton.weekDayInt) !== -1
         })
-        this.markers = this.badmintonList
-        // this.center = this.markers[0].position
+
+        this.locationList.forEach(function (location) {
+          return self.badmintonList.filter(function (badminton) {
+            return location.name === badminton.location
+          })
+        })
+        this.markers = this.locationList
+        this.center = this.markers[0].position
       },
       closeModal (e) {
         return e.cancel()
