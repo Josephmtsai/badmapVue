@@ -8,8 +8,8 @@
         <b-tabs small card ref="tabs" v-model="tabIndex">
           <b-tab id="mapTab" title="General Map">
 
-            <b-form-fieldset label="每周選項"  label-for="weeklist" >
-              <div role="group" id="checkboxes2">
+            <b-form-fieldset label="每周選項"  label-for="checkboxes1" >
+              <div role="group" id="checkboxes1">
                 <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
               </div>
             </b-form-fieldset>
@@ -20,15 +20,26 @@
             </gmap-map>
           </b-tab>
           <b-tab id="listTab" title="List Location Info">
-            <span class="label label-default" for="selectLocation">Specify Location</span>
-            <div >
-              <b-form-select v-model="selected"  id="selectLocation" value-field="name" text-field="name"  :options="locationList"  class="mb-3" ></b-form-select>
-            </div>
+            <b-form-fieldset label="每周選項"  label-for="checkboxes2" >
+              <div role="group" id="checkboxes2">
+                <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
+              </div>
+            </b-form-fieldset> 
+            <b-table striped hover show-empty :items="filterBadmintonList"  :fields="badmintonFields" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"  >
+              <template slot="location" scope="row">{{row.value}}</template>
+              <template slot="distance" scope="row">{{row.value}}</template>
+              <template slot="startTime" scope="row">{{row.value}}</template>
+              <template slot="endTime" scope="row">{{row.value}}</template>
+              <template slot="payInfo" scope="row">{{row.value}}</template>
+              <template slot="contactName" scope="row">{{row.value}}</template>
+              <template slot="contactPhone" scope="row">{{row.value}}</template>
+              <template slot="line" scope="row">{{row.value}}</template>
+            </b-table>
           </b-tab>
         </b-tabs>
       </b-card>
       <b-modal ref="modal" title="Location" @ok="closeModal" size="lg" >
-        <b-table striped hover show-empty :items="selectedBadmintonInfo"  :fields="badmintonFields" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"  >
+        <b-table striped hover show-empty :items="selectedBadmintonInfo"  :fields="badmintonSelectedFields" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"  >
           <template slot="location" scope="row">{{row.value}}</template>
           <template slot="startTime" scope="row">{{row.value}}</template>
           <template slot="endTime" scope="row">{{row.value}}</template>
@@ -72,11 +83,27 @@
   function getLocationInfoList () {
     return axios.get('https://qatbadmap.herokuapp.com/api/locationinfolist')
   }
-
+  function getDistanceFromLatLonInKm (lat1, lon1, lat2, lon2) {
+    var R = 6371 // Radius of the earth in km
+    var dLat = deg2rad(lat2 - lat1) // deg2rad below
+    var dLon = deg2rad(lon2 - lon1)
+    var a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+      Math.sin(dLon / 2) * Math.sin(dLon / 2)
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    var d = R * c // Distance in km
+    return d
+  }
+  
+  function deg2rad (deg) {
+    return deg * (Math.PI / 180)
+  }
   export default {
     data () {
       return {
         center: { lat: 25.079613, lng: 121.556082 },
+        defaultLocation: { lat: 25.079613, lng: 121.556082 },
         zoom: 15,
         tabIndex: 0,
         markers: [],
@@ -91,6 +118,16 @@
         sortBy: null,
         sortDesc: false,
         badmintonFields: {
+          location: { label: '地點', sortable: true },
+          distance: {label: '距離', sortable: true},
+          startTime: { label: '開始時間', sortable: true },
+          endTime: { label: '結束時間', sortable: true },
+          payInfo: { label: '金額', sortable: true, 'class': 'text-center' },
+          contactName: { label: '聯絡人' },
+          contactPhone: { label: '電話', sortable: true, 'class': 'text-center' },
+          line: { label: 'Line', sortable: true, 'class': 'text-center' }
+        },
+        badmintonSelectedFields: {
           location: { label: '地點', sortable: true },
           startTime: { label: '開始時間', sortable: true },
           endTime: { label: '結束時間', sortable: true },
@@ -109,6 +146,7 @@
       var self = this
       var today = new Date()
       self.todayWeekday = today.getDay()
+      self.getLocation()
       // default 3 days
       self.weekDays.push(self.todayWeekday)
       self.weekDays.push(self.todayWeekday + 1 > 6 ? 0 : self.todayWeekday + 1)
@@ -116,6 +154,9 @@
       axios.all([getBadminInfoList(), getLocationInfoList()]).then(axios.spread(function (badmintonResponse, locationResponse) {
         self.badmintonList = badmintonResponse.data
         self.locationList = locationResponse.data
+        self.badmintonList.forEach(function (badmintonInfo) {
+          badmintonInfo.distance = getDistanceFromLatLonInKm(self.defaultLocation.lat, self.defaultLocation.lng, badmintonInfo.position.lat, badmintonInfo.position.lng)
+        })
         self.loading = false
         self.updateMap()
       }))
@@ -144,7 +185,6 @@
           }).length > 0
         })
         this.markers = filterLocationList
-        self.getLocation()
       },
       closeModal (e) {
         return e.cancel()
@@ -163,7 +203,7 @@
       getLocation () {
         var self = this
         if (navigator.geolocation) {
-          return navigator.geolocation.getCurrentPosition(function (position) { self.center = {'lat': position.coords.latitude, 'lng': position.coords.longitude} })
+          return navigator.geolocation.getCurrentPosition(function (position) { self.center = {'lat': position.coords.latitude, 'lng': position.coords.longitude}; self.defaultLocation = {'lat': position.coords.latitude, 'lng': position.coords.longitude} })
         } else {
           console.log('Geolocation is not supported by this browser.')
           return { lat: 25.079613, lng: 121.556082 }
