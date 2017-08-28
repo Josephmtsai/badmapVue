@@ -28,6 +28,7 @@
             <b-table striped hover show-empty :items="filterBadmintonList"  :fields="badmintonFields" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"  >
               <template slot="location" scope="row">{{row.value}}</template>
               <template slot="distance" scope="row">{{row.value}}</template>
+              <template slot="weekDay" scope="row">{{row.value}}</template>
               <template slot="startTime" scope="row">{{row.value}}</template>
               <template slot="endTime" scope="row">{{row.value}}</template>
               <template slot="payInfo" scope="row">{{row.value}}</template>
@@ -41,6 +42,7 @@
       <b-modal ref="modal" title="Location" @ok="closeModal" size="lg" >
         <b-table striped hover show-empty :items="selectedBadmintonInfo"  :fields="badmintonSelectedFields" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"  >
           <template slot="location" scope="row">{{row.value}}</template>
+          <template slot="weekDay" scope="row">{{row.value}}</template>
           <template slot="startTime" scope="row">{{row.value}}</template>
           <template slot="endTime" scope="row">{{row.value}}</template>
           <template slot="payInfo" scope="row">{{row.value}}</template>
@@ -93,7 +95,7 @@
       Math.sin(dLon / 2) * Math.sin(dLon / 2)
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     var d = R * c // Distance in km
-    return d
+    return Math.round( d * 1000) /1000
   }
   
   function deg2rad (deg) {
@@ -119,7 +121,8 @@
         sortDesc: false,
         badmintonFields: {
           location: { label: '地點', sortable: true },
-          distance: {label: '距離', sortable: true},
+          distance: {label: '距離(KM)', sortable: true},
+          weekDay: { label: '禮拜幾', sortable: true },
           startTime: { label: '開始時間', sortable: true },
           endTime: { label: '結束時間', sortable: true },
           payInfo: { label: '金額', sortable: true, 'class': 'text-center' },
@@ -129,6 +132,7 @@
         },
         badmintonSelectedFields: {
           location: { label: '地點', sortable: true },
+          weekDay: { label: '禮拜幾', sortable: true },
           startTime: { label: '開始時間', sortable: true },
           endTime: { label: '結束時間', sortable: true },
           payInfo: { label: '金額', sortable: true, 'class': 'text-center' },
