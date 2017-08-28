@@ -13,6 +13,11 @@
                 <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
               </div>
             </b-form-fieldset>
+            <b-form-fieldset label="開始時間"  label-for="starHourRedis" >
+              <div role="group" id="starHourRedis">
+                <b-form-radio  v-model="selectedHour" :options="startTimeOptions"></b-form-radio>
+              </div>
+            </b-form-fieldset>
             <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
               <gmap-cluster >
                   <gmap-marker :key="index" v-for="m in markers" :position="m.position" :clickable="true" @click="showModal(m)" :label="m.name"  ></gmap-marker>
@@ -95,7 +100,7 @@
       Math.sin(dLon / 2) * Math.sin(dLon / 2)
     var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
     var d = R * c // Distance in km
-    return Math.round( d * 1000) /1000
+    return Math.round(d * 1000) / 1000
   }
   
   function deg2rad (deg) {
@@ -140,6 +145,13 @@
           contactPhone: { label: '電話', sortable: true, 'class': 'text-center' },
           line: { label: 'Line', sortable: true, 'class': 'text-center' }
         },
+        selectedHour: '',
+        startTimeOptions: [
+          { text: 'All Day', value: '' },
+          { text: '到中午十二點', value: '12' },
+          { text: '中午到下午六點', value: '18' },
+          { text: '六點後', value: '24' }
+        ],
         dateTimeRange: [],
         todayWeekday: 0,
         weekDays: [],
@@ -175,6 +187,9 @@
       },
       weekDays: function (val) {
         this.updateMap()
+      },
+      selectedHour: function (val) {
+        this.updateMap()
       }
     },
     methods: {
@@ -182,6 +197,9 @@
         var self = this
         this.filterBadmintonList = this.badmintonList.filter(function (badminton) {
           return self.weekDays.indexOf(badminton.weekDayInt) !== -1
+        })
+        this.filterBadmintonList = this.filterBadmintonList.filter(function (badminton) {
+          return self.selectedHour === '' || (badminton.startHour < parseInt(self.selectedHour) && badminton.startHour > parseInt(self.selectedHour) - 6)
         })
         var filterLocationList = this.locationList.filter(function (location) {
           return self.filterBadmintonList.filter(function (badminton) {
