@@ -30,6 +30,11 @@
                 <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
               </div>
             </b-form-fieldset> 
+            <b-form-fieldset label="開始時間"  label-for="starHourRedis" >
+              <div role="group" id="starHourRedis">
+                <b-form-radio  v-model="selectedHour" :options="startTimeOptions"></b-form-radio>
+              </div>
+            </b-form-fieldset>
             <b-table striped hover show-empty :items="filterBadmintonList"  :fields="badmintonFields" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"  >
               <template slot="location" scope="row">{{row.value}}</template>
               <template slot="distance" scope="row">{{row.value}}</template>
