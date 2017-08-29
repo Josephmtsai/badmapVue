@@ -1,23 +1,23 @@
 <template>
   <div  class="text-center col-12">
     <div align="center" v-if="loading" class="col-12 overlay">
-      <hour-glass size="500px"></hour-glass>
+      <hexagon size="100px"></hexagon>
     </div>
     <div class="col-12" v-if="!loading">
       <b-card no-block>
         <b-tabs small card ref="tabs" v-model="tabIndex">
           <b-tab id="mapTab" title="General Map">
-
-            <b-form-fieldset label="每周選項"  label-for="checkboxes1" >
-              <div role="group" id="checkboxes1">
-                <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
-              </div>
-            </b-form-fieldset>
-            <b-form-fieldset label="開始時間"  label-for="starHourRedis" >
-              <div role="group" id="starHourRedis">
-                <b-form-radio  v-model="selectedHour" :options="startTimeOptions"></b-form-radio>
-              </div>
-            </b-form-fieldset>
+            <div class="col-12" >
+              <b-form-fieldset label=""  label-for="checkboxes1" >
+                <div role="group" id="checkboxes1">
+                  <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
+                </div>
+              </b-form-fieldset> 
+              <b-form-fieldset label=""  label-for="starHourRedis1" >
+                <div role="group" id="starHourRedis1">
+                  <b-form-radio  v-model="selectedHour" :options="startTimeOptions"></b-form-radio>
+                </div>
+              </b-form-fieldset>
             <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
               <gmap-cluster >
                   <gmap-marker :key="index" v-for="m in markers" :position="m.position" :clickable="true" @click="showModal(m)" :label="m.name"  ></gmap-marker>
@@ -25,12 +25,12 @@
             </gmap-map>
           </b-tab>
           <b-tab id="listTab" title="List Location Info">
-            <b-form-fieldset label="每周選項"  label-for="checkboxes2" >
+            <b-form-fieldset label=""  label-for="checkboxes2" >
               <div role="group" id="checkboxes2">
                 <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
               </div>
             </b-form-fieldset> 
-            <b-form-fieldset label="開始時間"  label-for="starHourRedis" >
+            <b-form-fieldset label=""  label-for="starHourRedis" >
               <div role="group" id="starHourRedis">
                 <b-form-radio  v-model="selectedHour" :options="startTimeOptions"></b-form-radio>
               </div>
@@ -80,7 +80,7 @@
   import Vue from 'vue'
   import * as VueGoogleMaps from 'vue2-google-maps'
   import axios from 'axios'
-  import HourGlass from 'vue-loading-spinner/src/components/HourGlass.vue'
+  import Hexagon from 'vue-loading-spinner/src/components/Hexagon.vue'
   import DatePicker from 'vue2-datepicker'
   Vue.use(VueGoogleMaps, {
     load: {
@@ -238,7 +238,7 @@
       }
     },
     components: {
-      HourGlass,
+      Hexagon,
       DatePicker
     }
   }

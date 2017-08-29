@@ -1,7 +1,7 @@
 <template>
   <div id="app">
     <header>
-      <span>Vue.js PWA</span>
+      <span>QAT Badminton Map</span>
     </header>
     <main>
       <router-view></router-view>
@@ -36,7 +36,7 @@ header {
   margin: 0;
   height: 56px;
   padding: 0 16px 0 24px;
-  background-color: #35495E;
+  background-color: #3a4c5f;
   color: #ffffff;
 }
 
