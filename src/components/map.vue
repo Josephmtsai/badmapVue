@@ -24,10 +24,15 @@
               </div>
             </div>
             
-            <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
+            <gmap-map  class="col-12" style="height:800px" :center="defaultLocation"  :zoom="zoom"  map-type-id="roadmap"  >
               <gmap-cluster >
                   <gmap-marker :key="index" v-for="m in markers" :position="m.position" :clickable="true" @click="showModal(m)" :label="m.name"  ></gmap-marker>
               </gmap-cluster>
+              <gmap-marker :key="index" v-for="w in currentMarker" :position="w.position"  ></gmap-marker>
+              <gmap-info-window  :key="index" v-for="w in currentMarker" :position="w.position" opened="true">
+                 現在選擇的位置
+              </gmap-info-window>
+
             </gmap-map>
           </b-tab>
           <b-tab id="listTab" title="List Location Info">
@@ -126,8 +131,8 @@
   export default {
     data () {
       return {
-        center: { lat: 25.079613, lng: 121.556082 },
         defaultLocation: { lat: 25.079613, lng: 121.556082 },
+        currentMarker: [{'position': { 'lat': 25.079613, 'lng': 121.556082 }}],
         zoom: 15,
         tabIndex: 0,
         markers: [],
@@ -237,12 +242,11 @@
       showTodayInfo () {
         var self = this
         this.markers = this.badmintonList.filter(function (location) { return location.weekDayInt === self.todayWeekday })
-        this.center = this.markers[0].position
       },
       getLocation () {
         var self = this
         if (navigator.geolocation) {
-          return navigator.geolocation.getCurrentPosition(function (position) { self.center = {'lat': position.coords.latitude, 'lng': position.coords.longitude}; self.defaultLocation = {'lat': position.coords.latitude, 'lng': position.coords.longitude} })
+          return navigator.geolocation.getCurrentPosition(function (position) { self.defaultLocation = {'lat': position.coords.latitude, 'lng': position.coords.longitude}; self.currentMarker = [ {'position': {'lat': position.coords.latitude, 'lng': position.coords.longitude}} ] })
         } else {
           console.log('Geolocation is not supported by this browser.')
           return { lat: 25.079613, lng: 121.556082 }
