@@ -7,17 +7,23 @@
       <b-card no-block>
         <b-tabs small card ref="tabs" v-model="tabIndex">
           <b-tab id="mapTab" title="General Map">
-            <div class="col-12" >
-              <b-form-fieldset label=""  label-for="checkboxes1" >
-                <div role="group" id="checkboxes1">
-                  <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
-                </div>
-              </b-form-fieldset> 
-              <b-form-fieldset label=""  label-for="starHourRedis1" >
-                <div role="group" id="starHourRedis1">
-                  <b-form-radio  v-model="selectedHour" :options="startTimeOptions"></b-form-radio>
-                </div>
-              </b-form-fieldset>
+            <div class="row">
+              <div class="col-6" >
+                <b-form-fieldset label=""  label-for="checkboxes1" >
+                  <div role="group" id="checkboxes1">
+                    <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
+                  </div>
+                </b-form-fieldset>   
+              </div>
+              <div class="col-6" >
+                <b-form-fieldset label=""  label-for="starHourRedis1" >
+                  <div role="group" id="starHourRedis1">
+                    <b-form-radio  v-model="selectedHour" :options="startTimeOptions"></b-form-radio>
+                  </div>
+                </b-form-fieldset>
+              </div>
+            </div>
+            
             <gmap-map  class="col-12" style="height:800px" :center="center"  :zoom="zoom"  map-type-id="roadmap"  >
               <gmap-cluster >
                   <gmap-marker :key="index" v-for="m in markers" :position="m.position" :clickable="true" @click="showModal(m)" :label="m.name"  ></gmap-marker>
@@ -25,16 +31,22 @@
             </gmap-map>
           </b-tab>
           <b-tab id="listTab" title="List Location Info">
-            <b-form-fieldset label=""  label-for="checkboxes2" >
-              <div role="group" id="checkboxes2">
-                <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
+            <div class="row">
+              <div class="col-6" >
+                <b-form-fieldset label=""  label-for="checkboxes2" >
+                  <div role="group" id="checkboxes2">
+                    <b-form-checkbox  v-for="weekDayValue in weekDaysOptions" v-model="weekDays"  :value="weekDayValue.value">{{weekDayValue.label}}</b-form-checkbox>
+                  </div>
+                </b-form-fieldset>   
               </div>
-            </b-form-fieldset> 
-            <b-form-fieldset label=""  label-for="starHourRedis" >
-              <div role="group" id="starHourRedis">
-                <b-form-radio  v-model="selectedHour" :options="startTimeOptions"></b-form-radio>
+              <div class="col-6" >
+                <b-form-fieldset label=""  label-for="starHourRedis2" >
+                  <div role="group" id="starHourRedis2">
+                    <b-form-radio  v-model="selectedHour" :options="startTimeOptions"></b-form-radio>
+                  </div>
+                </b-form-fieldset>
               </div>
-            </b-form-fieldset>
+            </div>
             <b-table striped hover show-empty :items="filterBadmintonList"  :fields="badmintonFields" :sort-by.sync="sortBy" :sort-desc.sync="sortDesc"  >
               <template slot="location" scope="row">{{row.value}}</template>
               <template slot="distance" scope="row">{{row.value}}</template>
